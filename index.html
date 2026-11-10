@@ -1,0 +1,1082 @@
+<!DOCTYPE html>
+<html lang="uz" class="dark">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Futbol Olami - Dunyo va O'zbekiston Futbol Yangiliklari</title>
+  <!-- Tailwind CSS -->
+  <script src="https://cdn.tailwindcss.com"></script>
+  <!-- FontAwesome Icons -->
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+  <!-- Google Fonts: Montserrat & Inter -->
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&family=Montserrat:wght@700;800;900&display=swap" rel="stylesheet">
+
+  <script>
+    tailwind.config = {
+      darkMode: 'class',
+      theme: {
+        extend: {
+          colors: {
+            brand: {
+              navy: '#0b132b',
+              dark: '#1c2541',
+              card: '#1e293b',
+              accent: '#10b981', // Emerald
+              accentHover: '#059669',
+              gold: '#f59e0b',
+              crimson: '#ef4444'
+            }
+          },
+          fontFamily: {
+            sans: ['Inter', 'sans-serif'],
+            display: ['Montserrat', 'sans-serif']
+          }
+        }
+      }
+    }
+  </script>
+  <style>
+    /* Custom scrollbars and animations */
+    ::-webkit-scrollbar {
+      width: 6px;
+      height: 6px;
+    }
+    ::-webkit-scrollbar-track {
+      background: #0f172a;
+    }
+    ::-webkit-scrollbar-thumb {
+      background: #334155;
+      border-radius: 3px;
+    }
+    ::-webkit-scrollbar-thumb:hover {
+      background: #10b981;
+    }
+    .ticker-wrap {
+      overflow: hidden;
+      white-space: nowrap;
+    }
+    .ticker-move {
+      display: inline-block;
+      animation: ticker 35s linear infinite;
+    }
+    .ticker-move:hover {
+      animation-play-state: paused;
+    }
+    @keyframes ticker {
+      0% { transform: translate3d(0, 0, 0); }
+      100% { transform: translate3d(-50%, 0, 0); }
+    }
+    .glass-effect {
+      background: rgba(30, 41, 59, 0.7);
+      backdrop-filter: blur(12px);
+      -webkit-backdrop-filter: blur(12px);
+    }
+    .glow-emerald {
+      box-shadow: 0 0 20px rgba(16, 185, 129, 0.25);
+    }
+  </style>
+</head>
+<body class="bg-slate-950 text-slate-100 font-sans antialiased min-h-screen flex flex-col">
+
+  <!-- TOP LIVE MATCH TICKER -->
+  <div class="bg-slate-900 border-b border-slate-800 text-xs py-2 px-4 sticky top-0 z-50 shadow-md">
+    <div class="max-w-7xl mx-auto flex items-center justify-between">
+      <div class="flex items-center gap-2 text-emerald-400 font-bold shrink-0 pr-3 border-r border-slate-700">
+        <span class="relative flex h-2.5 w-2.5">
+          <span class="animate-ping absolute inline-flex h-full w-full rounded-full bg-emerald-400 opacity-75"></span>
+          <span class="relative inline-flex rounded-full h-2.5 w-2.5 bg-emerald-500"></span>
+        </span>
+        LIVE SCORES:
+      </div>
+      <div class="ticker-wrap flex-1 ml-4 overflow-hidden">
+        <div class="ticker-move flex gap-8 items-center" id="ticker-content">
+          <!-- Dynamically populated ticker items -->
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- NAVIGATION HEADER -->
+  <header class="bg-slate-900/90 backdrop-blur-md border-b border-slate-800 sticky top-9 z-40">
+    <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+      <div class="flex items-center justify-between h-20">
+        <!-- Logo -->
+        <div class="flex items-center gap-3 cursor-pointer" onclick="filterCategory('all')">
+          <div class="w-12 h-12 bg-gradient-to-tr from-emerald-500 to-teal-400 rounded-xl flex items-center justify-center text-slate-950 font-display text-2xl font-black shadow-lg shadow-emerald-500/20 transform hover:rotate-6 transition">
+            <i class="fa-solid fa-futbol"></i>
+          </div>
+          <div>
+            <span class="font-display font-black text-2xl tracking-tight bg-gradient-to-r from-white via-slate-200 to-emerald-400 bg-clip-text text-transparent">
+              FUTBOL<span class="text-emerald-400">OLAMI</span>
+            </span>
+            <span class="block text-[10px] text-slate-400 tracking-widest font-semibold uppercase -mt-1">O'zbekiston & Dunyo</span>
+          </div>
+        </div>
+
+        <!-- Desktop Navigation Categories -->
+        <nav class="hidden lg:flex items-center space-x-1">
+          <button onclick="filterCategory('all')" class="nav-btn text-emerald-400 font-semibold px-3 py-2 rounded-lg text-sm transition hover:bg-slate-800">Barchasi</button>
+          <button onclick="filterCategory('UCL')" class="nav-btn text-slate-300 font-medium hover:text-white px-3 py-2 rounded-lg text-sm transition hover:bg-slate-800">Chempionlar Ligasi</button>
+          <button onclick="filterCategory('EPL')" class="nav-btn text-slate-300 font-medium hover:text-white px-3 py-2 rounded-lg text-sm transition hover:bg-slate-800">APL</button>
+          <button onclick="filterCategory('La Liga')" class="nav-btn text-slate-300 font-medium hover:text-white px-3 py-2 rounded-lg text-sm transition hover:bg-slate-800">La Liga</button>
+          <button onclick="filterCategory('Superliga')" class="nav-btn text-slate-300 font-medium hover:text-white px-3 py-2 rounded-lg text-sm transition hover:bg-slate-800">Superliga UZ</button>
+          <button onclick="filterCategory('Transfers')" class="nav-btn text-amber-400 font-semibold px-3 py-2 rounded-lg text-sm transition hover:bg-slate-800"><i class="fa-solid fa-right-left mr-1"></i> Transferlar</button>
+        </nav>
+
+        <!-- Search & Action -->
+        <div class="flex items-center gap-3">
+          <div class="relative hidden sm:block">
+            <input type="text" id="search-input" onkeyup="handleSearch()" placeholder="Yangilik yoki futbolchi..." class="bg-slate-800 border border-slate-700 text-sm rounded-full py-2 pl-9 pr-4 text-slate-200 placeholder-slate-400 focus:outline-none focus:border-emerald-500 w-48 lg:w-60 transition-all">
+            <i class="fa-solid fa-magnifying-glass absolute left-3 top-2.5 text-slate-400 text-sm"></i>
+          </div>
+          <button onclick="openModal('notification-modal')" class="p-2 text-slate-400 hover:text-emerald-400 rounded-full hover:bg-slate-800 transition relative">
+            <i class="fa-regular fa-bell text-lg"></i>
+            <span class="absolute top-1 right-1 w-2 h-2 bg-emerald-500 rounded-full animate-pulse"></span>
+          </button>
+          <!-- Mobile Menu Toggle Button -->
+          <button onclick="toggleMobileMenu()" class="lg:hidden p-2 text-slate-400 hover:text-white">
+            <i class="fa-solid fa-bars text-xl"></i>
+          </button>
+        </div>
+      </div>
+    </div>
+
+    <!-- Mobile Nav Dropdown -->
+    <div id="mobile-menu" class="hidden lg:hidden bg-slate-900 border-b border-slate-800 px-4 pt-2 pb-4 space-y-2">
+      <input type="text" id="search-input-mobile" onkeyup="handleSearchMobile()" placeholder="Qidirish..." class="w-full bg-slate-800 border border-slate-700 text-sm rounded-lg py-2 px-3 text-slate-200 mb-2">
+      <button onclick="filterCategory('all'); toggleMobileMenu()" class="block w-full text-left py-2 text-emerald-400 font-semibold">Barchasi</button>
+      <button onclick="filterCategory('UCL'); toggleMobileMenu()" class="block w-full text-left py-2 text-slate-300">Chempionlar Ligasi</button>
+      <button onclick="filterCategory('EPL'); toggleMobileMenu()" class="block w-full text-left py-2 text-slate-300">APL (Angliya)</button>
+      <button onclick="filterCategory('La Liga'); toggleMobileMenu()" class="block w-full text-left py-2 text-slate-300">La Liga (Ispaniya)</button>
+      <button onclick="filterCategory('Superliga'); toggleMobileMenu()" class="block w-full text-left py-2 text-slate-300">Superliga O'zbekiston</button>
+      <button onclick="filterCategory('Transfers'); toggleMobileMenu()" class="block w-full text-left py-2 text-amber-400 font-semibold">Transferlar</button>
+    </div>
+  </header>
+
+  <!-- MAIN CONTAINER -->
+  <main class="flex-1 max-w-7xl w-full mx-auto px-4 sm:px-6 lg:px-8 py-8 space-y-12">
+
+    <!-- BREAKING HERO BANNER & MAIN NEWS -->
+    <section class="grid grid-cols-1 lg:grid-cols-3 gap-6">
+      <!-- Main Featured Hero Story -->
+      <div id="featured-hero" class="lg:col-span-2 relative rounded-2xl overflow-hidden group border border-slate-800 bg-slate-900 min-h-[420px] sm:min-h-[480px] flex flex-col justify-end p-6 sm:p-8 cursor-pointer shadow-2xl transition hover:border-emerald-500/50">
+        <!-- Hero Image background loaded via JS -->
+      </div>
+
+      <!-- Top Trending Stories Column -->
+      <div class="bg-slate-900 border border-slate-800 rounded-2xl p-5 flex flex-col justify-between">
+        <div class="flex items-center justify-between pb-4 border-b border-slate-800">
+          <h3 class="font-display font-bold text-lg text-white flex items-center gap-2">
+            <i class="fa-solid fa-fire text-amber-400"></i> Dolzarb Xabarlar
+          </h3>
+          <span class="text-xs text-slate-400 font-medium">So'nggi soatlarda</span>
+        </div>
+        <div class="space-y-4 my-4 flex-1 overflow-y-auto max-h-[380px] pr-1" id="trending-news-list">
+          <!-- Dynamically populated -->
+        </div>
+        <button onclick="filterCategory('all')" class="w-full py-2.5 bg-slate-800 hover:bg-slate-700 text-slate-300 font-medium text-xs rounded-xl transition flex items-center justify-center gap-2">
+          Barcha yangiliklarni ko'rish <i class="fa-solid fa-arrow-right"></i>
+        </button>
+      </div>
+    </section>
+
+    <!-- INTERACTIVE MATCH CENTER & STANDINGS DASHBOARD -->
+    <section class="bg-slate-900 border border-slate-800 rounded-2xl p-6 shadow-xl">
+      <!-- Section Header with Tabs -->
+      <div class="flex flex-col md:flex-row md:items-center justify-between gap-4 pb-6 border-b border-slate-800">
+        <div>
+          <h2 class="font-display font-extrabold text-2xl text-white tracking-tight flex items-center gap-2">
+            <i class="fa-solid fa-trophy text-emerald-400"></i> O'yinlar va Jadvallar Markazi
+          </h2>
+          <p class="text-xs text-slate-400 mt-1">Jonli natijalar, liga jadvallari hamda to'purarlar ro'yxati</p>
+        </div>
+
+        <!-- Dashboard Navigation Tabs -->
+        <div class="flex bg-slate-950 p-1 rounded-xl border border-slate-800 self-start md:self-auto">
+          <button onclick="switchDashboardTab('matches')" id="tab-btn-matches" class="px-4 py-2 text-xs font-bold rounded-lg transition bg-emerald-500 text-slate-950 shadow">
+            <i class="fa-solid fa-stopwatch mr-1"></i> O'yinlar
+          </button>
+          <button onclick="switchDashboardTab('table')" id="tab-btn-table" class="px-4 py-2 text-xs font-bold text-slate-400 hover:text-white rounded-lg transition">
+            <i class="fa-solid fa-table-list mr-1"></i> Jadvallar
+          </button>
+          <button onclick="switchDashboardTab('scorers')" id="tab-btn-scorers" class="px-4 py-2 text-xs font-bold text-slate-400 hover:text-white rounded-lg transition">
+            <i class="fa-solid fa-bullseye mr-1"></i> To'purarlar
+          </button>
+        </div>
+      </div>
+
+      <!-- TAB CONTENT 1: MATCHES -->
+      <div id="dashboard-matches" class="mt-6">
+        <!-- League Filter Chips -->
+        <div class="flex items-center gap-2 overflow-x-auto pb-3 mb-4 text-xs font-semibold">
+          <button onclick="filterMatches('all')" class="match-filter-chip bg-emerald-500/10 text-emerald-400 border border-emerald-500/30 px-3 py-1.5 rounded-full shrink-0">Barchasi</button>
+          <button onclick="filterMatches('UCL')" class="match-filter-chip bg-slate-800 text-slate-300 hover:bg-slate-700 px-3 py-1.5 rounded-full shrink-0">UEFA Champions League</button>
+          <button onclick="filterMatches('EPL')" class="match-filter-chip bg-slate-800 text-slate-300 hover:bg-slate-700 px-3 py-1.5 rounded-full shrink-0">Premier League</button>
+          <button onclick="filterMatches('LaLiga')" class="match-filter-chip bg-slate-800 text-slate-300 hover:bg-slate-700 px-3 py-1.5 rounded-full shrink-0">La Liga</button>
+          <button onclick="filterMatches('Superliga')" class="match-filter-chip bg-slate-800 text-slate-300 hover:bg-slate-700 px-3 py-1.5 rounded-full shrink-0">Uzbekistan Super League</button>
+        </div>
+
+        <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4" id="matches-grid">
+          <!-- Populated by JS -->
+        </div>
+      </div>
+
+      <!-- TAB CONTENT 2: LEAGUE TABLE -->
+      <div id="dashboard-table" class="mt-6 hidden">
+        <div class="flex items-center justify-between mb-4">
+          <select id="league-select" onchange="renderStandingsTable(this.value)" class="bg-slate-800 border border-slate-700 text-sm font-semibold rounded-lg px-3 py-2 text-emerald-400 focus:outline-none">
+            <option value="UCL">UEFA Champions League - Guruh bosqichi</option>
+            <option value="EPL" selected>Angliya Premier Ligasi 2025/26</option>
+            <option value="LaLiga">Ispaniya La Ligasi</option>
+            <option value="Superliga">O'zbekiston Superligasi</option>
+          </select>
+          <span class="text-xs text-slate-400 hidden sm:inline"><i class="fa-solid fa-circle-info mr-1"></i> TOP-4 Yevropa Chempionlar Ligasiga yo'llanma oladi</span>
+        </div>
+        <div class="overflow-x-auto">
+          <table class="w-full text-left text-sm text-slate-300">
+            <thead class="bg-slate-950 text-xs uppercase text-slate-400 border-b border-slate-800">
+              <tr>
+                <th class="py-3 px-3">#</th>
+                <th class="py-3 px-4">Jamoa</th>
+                <th class="py-3 px-2 text-center">O'YN</th>
+                <th class="py-3 px-2 text-center">G'</th>
+                <th class="py-3 px-2 text-center">D</th>
+                <th class="py-3 px-2 text-center">M</th>
+                <th class="py-3 px-2 text-center hidden sm:table-cell">T-N</th>
+                <th class="py-3 px-3 text-center font-bold text-white">OCHKO</th>
+              </tr>
+            </thead>
+            <tbody id="standings-table-body" class="divide-y divide-slate-800/60 font-medium">
+              <!-- Populated by JS -->
+            </tbody>
+          </table>
+        </div>
+      </div>
+
+      <!-- TAB CONTENT 3: TOP SCORERS -->
+      <div id="dashboard-scorers" class="mt-6 hidden">
+        <div class="grid grid-cols-1 md:grid-cols-3 gap-6" id="top-scorers-container">
+          <!-- Populated by JS -->
+        </div>
+      </div>
+    </section>
+
+    <!-- NEWS ARTICLES MAIN GRID -->
+    <section>
+      <div class="flex items-center justify-between mb-6">
+        <div>
+          <h2 class="font-display font-extrabold text-2xl text-white tracking-tight flex items-center gap-2">
+            <i class="fa-regular fa-newspaper text-emerald-400"></i> Barcha Yangiliklar
+          </h2>
+          <p class="text-xs text-slate-400">Eng so'nggi voqealar, tahlillar va eksklyuziv xabarlar</p>
+        </div>
+        <div class="flex gap-2">
+          <span id="active-category-badge" class="bg-emerald-500/10 text-emerald-400 border border-emerald-500/30 px-3 py-1 rounded-full text-xs font-bold">
+            Kategoriya: Barchasi
+          </span>
+        </div>
+      </div>
+
+      <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6" id="news-grid">
+        <!-- Dynamically rendered news cards -->
+      </div>
+    </section>
+
+    <!-- INTERACTIVE TRANSFER CENTER -->
+    <section class="bg-slate-900 border border-slate-800 rounded-2xl p-6 relative overflow-hidden shadow-2xl">
+      <!-- Decorative background blur -->
+      <div class="absolute -top-24 -right-24 w-96 h-96 bg-amber-500/10 rounded-full blur-3xl pointer-events-none"></div>
+
+      <div class="flex flex-col md:flex-row md:items-center justify-between gap-4 pb-6 border-b border-slate-800 relative z-10">
+        <div>
+          <span class="text-amber-400 text-xs font-extrabold tracking-widest uppercase">Eksklyuziv Insayderlar</span>
+          <h2 class="font-display font-extrabold text-2xl text-white tracking-tight flex items-center gap-2">
+            <i class="fa-solid fa-right-left text-amber-400"></i> Transfer Markazi & Mish-mishlar
+          </h2>
+        </div>
+        <div class="flex items-center gap-2">
+          <span class="inline-flex items-center px-2.5 py-1 rounded-full text-xs font-semibold bg-amber-400/10 text-amber-400 border border-amber-400/20">
+            <i class="fa-solid fa-bolt mr-1"></i> Transfer Oynasi Ochiq
+          </span>
+        </div>
+      </div>
+
+      <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 mt-6 relative z-10" id="transfer-cards-grid">
+        <!-- Transfer cards injected via JS -->
+      </div>
+    </section>
+
+    <!-- INTERACTIVE FAN POLL & FAN ZONE COMMENTS -->
+    <section class="grid grid-cols-1 lg:grid-cols-3 gap-8">
+      <!-- Player of the Week Poll -->
+      <div class="bg-slate-900 border border-slate-800 rounded-2xl p-6 flex flex-col justify-between shadow-xl">
+        <div>
+          <div class="flex items-center justify-between mb-4">
+            <span class="bg-emerald-500/10 text-emerald-400 text-xs font-bold px-3 py-1 rounded-full border border-emerald-500/20">
+              Muxlislar Tanlovi
+            </span>
+            <span class="text-xs text-slate-400"><i class="fa-regular fa-clock mr-1"></i> Ovoz berish davom etmoqda</span>
+          </div>
+          <h3 class="font-display font-extrabold text-xl text-white mb-2">Haftaning Eng Yaxshi O'yinchisi Kim?</h3>
+          <p class="text-xs text-slate-400 mb-6">O'z ovozingizni bering va natijalarni jonli tomosha qiling!</p>
+
+          <div class="space-y-4" id="poll-options">
+            <!-- Dynamic poll options -->
+          </div>
+        </div>
+
+        <div class="mt-6 pt-4 border-t border-slate-800 flex items-center justify-between text-xs text-slate-400">
+          <span id="total-votes-count"><i class="fa-solid fa-users mr-1"></i> Jami: 14,890 ovoz</span>
+          <button onclick="resetPoll()" class="hover:text-emerald-400 transition underline">Ovozni qayta tiklash</button>
+        </div>
+      </div>
+
+      <!-- Live Fan Commentary & Discussion -->
+      <div class="lg:col-span-2 bg-slate-900 border border-slate-800 rounded-2xl p-6 flex flex-col justify-between shadow-xl">
+        <div>
+          <div class="flex items-center justify-between pb-4 border-b border-slate-800 mb-4">
+            <h3 class="font-display font-bold text-lg text-white flex items-center gap-2">
+              <i class="fa-regular fa-comments text-emerald-400"></i> Muxlislar Munozarasi (Fan Zone)
+            </h3>
+            <span class="text-xs text-emerald-400 font-medium flex items-center gap-1">
+              <span class="w-2 h-2 rounded-full bg-emerald-400 animate-ping"></span> Onlayn 482 ta muxlis
+            </span>
+          </div>
+
+          <!-- Comment Input -->
+          <form onsubmit="submitComment(event)" class="mb-6 space-y-3">
+            <div class="grid grid-cols-1 sm:grid-cols-2 gap-3">
+              <input type="text" id="comment-author" placeholder="Ismingiz yoki Taxallusingiz" required class="bg-slate-800 border border-slate-700 text-xs rounded-xl px-4 py-2.5 text-white placeholder-slate-400 focus:outline-none focus:border-emerald-500">
+              <select id="comment-team" class="bg-slate-800 border border-slate-700 text-xs rounded-xl px-4 py-2.5 text-slate-300 focus:outline-none focus:border-emerald-500">
+                <option value="Real Madrid">Real Madrid Fan</option>
+                <option value="Barcelona">Barcelona Fan</option>
+                <option value="Man City">Manchester City Fan</option>
+                <option value="Uzbekistan">O'zbekiston Milliy Terma Fan</option>
+                <option value="Neutral">Neytral Futbol Muxlisi</option>
+              </select>
+            </div>
+            <div class="flex gap-2">
+              <input type="text" id="comment-text" placeholder="Fikringizni yozib qoldiring..." required class="flex-1 bg-slate-800 border border-slate-700 text-xs rounded-xl px-4 py-2.5 text-white placeholder-slate-400 focus:outline-none focus:border-emerald-500">
+              <button type="submit" class="bg-emerald-500 hover:bg-emerald-600 text-slate-950 font-bold px-5 py-2.5 rounded-xl text-xs transition flex items-center gap-1 shrink-0">
+                <i class="fa-solid fa-paper-plane"></i> Jo'natish
+              </button>
+            </div>
+          </form>
+
+          <!-- Comment Feed -->
+          <div class="space-y-3 max-h-[280px] overflow-y-auto pr-2" id="comments-feed">
+            <!-- Populated dynamically -->
+          </div>
+        </div>
+      </div>
+    </section>
+
+  </main>
+
+  <!-- FOOTER -->
+  <footer class="bg-slate-900 border-t border-slate-800 mt-16 text-slate-400 text-sm">
+    <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-12">
+      <div class="grid grid-cols-1 md:grid-cols-4 gap-8 mb-8">
+        <div class="space-y-3">
+          <div class="flex items-center gap-2">
+            <div class="w-8 h-8 bg-emerald-500 rounded-lg flex items-center justify-center text-slate-950 font-black text-lg">
+              <i class="fa-solid fa-futbol"></i>
+            </div>
+            <span class="font-display font-black text-xl text-white">FUTBOL<span class="text-emerald-400">OLAMI</span></span>
+          </div>
+          <p class="text-xs text-slate-400 leading-relaxed">
+            O'zbekistondagi eng tezkor va ishonchli futbol media platformasi. Jahon hamda mahalliy futbolning eng so'nggi xabarlari, tahlillar va eksklyuziv intervyular.
+          </p>
+        </div>
+        <div>
+          <h4 class="text-white font-bold text-sm mb-3 font-display">Musobaqalar</h4>
+          <ul class="space-y-2 text-xs">
+            <li><a href="#" onclick="filterCategory('UCL')" class="hover:text-emerald-400 transition">UEFA Chempionlar Ligasi</a></li>
+            <li><a href="#" onclick="filterCategory('EPL')" class="hover:text-emerald-400 transition">Angliya Premier Ligasi</a></li>
+            <li><a href="#" onclick="filterCategory('La Liga')" class="hover:text-emerald-400 transition">Ispaniya La Ligasi</a></li>
+            <li><a href="#" onclick="filterCategory('Superliga')" class="hover:text-emerald-400 transition">O'zbekiston Superligasi</a></li>
+            <li><a href="#" class="hover:text-emerald-400 transition">A Seriya & Bundesligalar</a></li>
+          </ul>
+        </div>
+        <div>
+          <h4 class="text-white font-bold text-sm mb-3 font-display">Ruknlar</h4>
+          <ul class="space-y-2 text-xs">
+            <li><a href="#" onclick="filterCategory('Transfers')" class="hover:text-emerald-400 transition">Transferlar Markazi</a></li>
+            <li><a href="#" class="hover:text-emerald-400 transition">Tahliliy Maolalar</a></li>
+            <li><a href="#" class="hover:text-emerald-400 transition">Intervyular va Statistica</a></li>
+            <li><a href="#" class="hover:text-emerald-400 transition">O'yinlar Jadvali & Natijalar</a></li>
+          </ul>
+        </div>
+        <div>
+          <h4 class="text-white font-bold text-sm mb-3 font-display">Bizni kuzatib boring</h4>
+          <div class="flex space-x-3 mb-4">
+            <a href="#" class="w-9 h-9 bg-slate-800 hover:bg-emerald-500 hover:text-slate-950 rounded-lg flex items-center justify-center transition"><i class="fa-brands fa-telegram text-base"></i></a>
+            <a href="#" class="w-9 h-9 bg-slate-800 hover:bg-emerald-500 hover:text-slate-950 rounded-lg flex items-center justify-center transition"><i class="fa-brands fa-youtube text-base"></i></a>
+            <a href="#" class="w-9 h-9 bg-slate-800 hover:bg-emerald-500 hover:text-slate-950 rounded-lg flex items-center justify-center transition"><i class="fa-brands fa-instagram text-base"></i></a>
+            <a href="#" class="w-9 h-9 bg-slate-800 hover:bg-emerald-500 hover:text-slate-950 rounded-lg flex items-center justify-center transition"><i class="fa-brands fa-x-twitter text-base"></i></a>
+          </div>
+          <p class="text-xs text-slate-500">Telegram kanalimiz: @futbololami_uz</p>
+        </div>
+      </div>
+      <div class="border-t border-slate-800 pt-6 flex flex-col sm:flex-row justify-between items-center text-xs text-slate-500">
+        <p>&copy; 2026 Futbol Olami. Barcha huquqlar himoyalangan.</p>
+        <div class="flex space-x-4 mt-2 sm:mt-0">
+          <a href="#" class="hover:underline">Maxfiylik siyosati</a>
+          <a href="#" class="hover:underline">Foydalanish shartlari</a>
+          <a href="#" class="hover:underline">Bog'lanish</a>
+        </div>
+      </div>
+    </div>
+  </footer>
+
+  <!-- ARTICLE READER MODAL -->
+  <div id="article-modal" class="fixed inset-0 bg-slate-950/80 backdrop-blur-md z-50 hidden flex items-center justify-center p-4">
+    <div class="bg-slate-900 border border-slate-800 w-full max-w-3xl max-h-[90vh] rounded-2xl overflow-y-auto flex flex-col shadow-2xl relative animate-fadeIn">
+      <button onclick="closeModal('article-modal')" class="absolute top-4 right-4 w-10 h-10 bg-slate-800 hover:bg-slate-700 text-white rounded-full flex items-center justify-center z-20 transition">
+        <i class="fa-solid fa-xmark text-lg"></i>
+      </button>
+      <div id="modal-article-content">
+        <!-- Injected via JS -->
+      </div>
+    </div>
+  </div>
+
+  <!-- NOTIFICATION MODAL -->
+  <div id="notification-modal" class="fixed inset-0 bg-slate-950/80 backdrop-blur-md z-50 hidden flex items-center justify-center p-4">
+    <div class="bg-slate-900 border border-slate-800 w-full max-w-md rounded-2xl p-6 shadow-2xl relative">
+      <button onclick="closeModal('notification-modal')" class="absolute top-4 right-4 text-slate-400 hover:text-white">
+        <i class="fa-solid fa-xmark text-lg"></i>
+      </button>
+      <h3 class="text-lg font-bold text-white mb-2 font-display flex items-center gap-2">
+        <i class="fa-regular fa-bell text-emerald-400"></i> Obuna bo'ling
+      </h3>
+      <p class="text-xs text-slate-300 mb-4">Eng so'nggi va tezkor matnli xabarlarni brauzeringizda qabul qilish uchun bildirishnomalarga ruxsat bering.</p>
+      <div class="space-y-3">
+        <button onclick="alert('Rahmat! Bildirishnomalar muvaffaqiyatli yoqildi.'); closeModal('notification-modal')" class="w-full py-2.5 bg-emerald-500 hover:bg-emerald-600 text-slate-950 font-bold rounded-xl text-xs transition">
+          Bildirishnomalarni Yoqish
+        </button>
+        <button onclick="closeModal('notification-modal')" class="w-full py-2.5 bg-slate-800 hover:bg-slate-700 text-slate-300 font-medium rounded-xl text-xs transition">
+          Keyinroq
+        </button>
+      </div>
+    </div>
+  </div>
+
+  <!-- JAVASCRIPT LOGIC -->
+  <script>
+    // MOCK DATA STORE
+    const MOCK_DATA = {
+      ticker: [
+        { league: "UCL", match: "Real Madrid 2 - 1 Bayern Munich", status: "88'" },
+        { league: "EPL", match: "Man City 3 - 2 Arsenal", status: "FT" },
+        { league: "La Liga", match: "Barcelona 2 - 0 Atletico Madrid", status: "62'" },
+        { league: "Superliga", match: "Paxtakor 1 - 1 Nasaf", status: "FT" },
+        { league: "Serie A", match: "Inter 3 - 1 Juventus", status: "74'" }
+      ],
+      news: [
+        {
+          id: 1,
+          title: "Kilian Mbappe Chempionlar Ligasida navbatdagi xet-trik muallifiga aylandi",
+          category: "UCL",
+          summary: "Real Madrid hujumchisi Kilian Mbappe UEFA Chempionlar Ligasi doirasidagi muhim bahsda raqib darvozasiga 3 ta gol urib, jamoasiga navbatdagi g'alabani taqdim etdi.",
+          fullText: "Ispaniyaning 'Real Madrid' klubi uzviy yetakchisi Kilian Mbappe Chempionlar Ligasining chorak final uchrashuvida ajoyib o'yin ko'rsatdi. Frantsiyalik yulduz 90 daqiqa davomida maydonda to'liq ustunlik qildi. Birinchi golni 23-daqiqada jarima maydonchasi tashqarisidan yo'llangan kuchli zarba bilan kiritgan bo'lsa, ikkinchi gol 45-daqiqada penaltidan urildi. 78-daqiqada u uchinchi golini kiritib, xet-trikni rasmiylashtirdi. O'yindan so'ng bergan intervyusida Mbappe: 'Biz barcha musobaqalarda chempionlikni ko'zlaganmiz ва bu g'alaba jamoaviy mehnat mahsulidir', deb ta'kidladi.",
+          image: "https://images.unsplash.com/photo-1508098682722-e99c43a406b2?auto=format&fit=crop&w=1000&q=80",
+          author: "Anvar Zokirov",
+          date: "10-Mart, 2026",
+          views: "14.2k",
+          readTime: "4 min",
+          featured: true
+        },
+        {
+          id: 2,
+          title: "Eldor Shomurodov terma jamoadagi gollar sonini 45 taga yetkazib oldi",
+          category: "Superliga",
+          summary: "O'zbekiston Milliy Terma jamoasi saralash uchrashuvida navbatdagi muhim g'alabani qo'lga kiritdi. Shomurodov dubl qayd etdi.",
+          fullText: "O'zbekiston Milliy Terma jamoasi sardori va yetakchi hujumchisi Eldor Shomurodov navbatdagi xalqaro o'yinda yana o'zini ko'rsatdi. Uning urgan ikki goli terma jamoamizga muhim 3 ochkoni keltirdi. Ushbu natija orqali Shomurodov milliy jamoadagi umumiy gollari sonini 45 taga yetkazdi va O'zbekiston futbol tarixidagi eng yaxshi to'purar sifatidagi mavqeini yanada mustahkamladi.",
+          image: "https://images.unsplash.com/photo-1574629810360-7efbbe195018?auto=format&fit=crop&w=800&q=80",
+          author: "Jahongir Qosimov",
+          date: "10-Mart, 2026",
+          views: "9.8k",
+          readTime: "3 min",
+          featured: false
+        },
+        {
+          id: 3,
+          title: "Judo Bellinghem va Vinisius Junior o'rtasidagi maydon ichidagi mukammal bog'liqlik",
+          category: "La Liga",
+          summary: "Taktik tahlil: Real Madridning yarim himoya va hujum chizig'i qanday qilib Yevropaning eng xavfli juftligiga aylandi?",
+          fullText: "Karlo Anchelotti shogirdlari bu mavsumda ajoyib barqarorlik namoyish etishmoqda. Ayniqsa Jud Bellinghem hamda Vinisius Junior o'rtasidagi o'zaro tushunish darajasi yuqori ko'rsatkichda. Tahlillarga ko'ra, uzoq masofali paslarning 85 foizi aynan ushbu ikki futbolchi hamkorligida golli vaziyatlarga aylanmoqda.",
+          image: "https://images.unsplash.com/photo-1517927033932-b3d18e61fb3a?auto=format&fit=crop&w=800&q=80",
+          author: "Jamshid Alimov",
+          date: "09-Mart, 2026",
+          views: "7.1k",
+          readTime: "5 min",
+          featured: false
+        },
+        {
+          id: 4,
+          title: "Erling Xoland Premier Ligadagi navbatdagi rekordni yangiladi",
+          category: "EPL",
+          summary: "Manchester Siti hujumchisi ketma-ket 10 ta mehmondagi o'yinda gol urgan birinchi futbolchiga aylandi.",
+          fullText: "Erling Xoland Angliya Premer-Ligasida to'purarlik poygasida yaqqol peshqadamlik qilishda davom etmoqda. Oxirgi bahsda kiritilgan gol evaziga u mehmondagi o'yinlar seriyasi bo'yicha chempionatning yangi rekordchisi bo'ldi. Pep Gvardiola u haqida: 'Erling gol urish uchun tug'ilgan mashina', deya ta'rif berdi.",
+          image: "https://images.unsplash.com/photo-1522778119026-d647f0596c20?auto=format&fit=crop&w=800&q=80",
+          author: "Anvar Zokirov",
+          date: "09-Mart, 2026",
+          views: "11.5k",
+          readTime: "3 min",
+          featured: false
+        },
+        {
+          id: 5,
+          title: "Abduqodir Xusanov Yevropaning TOP-3 klublari e'tibor markazida",
+          category: "Transfers",
+          summary: "O'zbekistonlik iqtidorli himoyachi Yevropa grands jamoalarining rasmiy skauting ro'yxatiga kiritildi.",
+          fullText: "Hamyurtimiz Abduqodir Xusanovning mustahkam va ishonchli o'yinlari Yevropa gigantlarining diqqat-e'tiborini tortdi. Insayderlarning xabar berishicha, Angliya va Ispaniyaning yetakchi klublari futbolchining agenti bilan dastlabki muloqotlarni boshlashgan. Transfer yozgi darcha vaqtida amalga oshishi kutilmoqda.",
+          image: "https://images.unsplash.com/photo-1560272564-c83b66b1ad12?auto=format&fit=crop&w=800&q=80",
+          author: "Jahongir Qosimov",
+          date: "08-Mart, 2026",
+          views: "18.9k",
+          readTime: "4 min",
+          featured: false
+        },
+        {
+          id: 6,
+          title: "Nasaf va Paxtakor o'rtasidagi markaziy uchrashuvda durang qayd etildi",
+          category: "Superliga",
+          summary: "O'zbekiston Superligasining turning eng markaziy bahsida tomoshabinlar 2 ta gol guvohi bo'lishdi.",
+          fullText: "Qarshining 'Nasaf' hamda Toshkentning 'Paxtakor' jamoalari o'rtasidagi bahs kutilgandek murosasiz kechdi. Har ikki jamoa ham bir necha qulay imkoniyatlarga ega bo'ldi. Uchrashuv 1:1 hisobidagi durang bilan yakunlandi va turnir jadvalidagi intriqa saqlanib qoldi.",
+          image: "https://images.unsplash.com/photo-1579952363873-27f3bade9f55?auto=format&fit=crop&w=800&q=80",
+          author: "Sardor Salimov",
+          date: "08-Mart, 2026",
+          views: "6.3k",
+          readTime: "3 min",
+          featured: false
+        }
+      ],
+      matches: [
+        { id: 101, league: "UCL", home: "Real Madrid", away: "Bayern Munich", homeScore: 2, awayScore: 1, minute: "88'", live: true, statusText: "Ikkinchi bo'lim" },
+        { id: 102, league: "EPL", home: "Man City", away: "Arsenal", homeScore: 3, awayScore: 2, minute: "90+4'", live: false, statusText: "Tugadi" },
+        { id: 103, league: "LaLiga", home: "Barcelona", away: "Atl. Madrid", homeScore: 2, awayScore: 0, minute: "62'", live: true, statusText: "Ikkinchi bo'lim" },
+        { id: 104, league: "Superliga", home: "Paxtakor", away: "Nasaf", homeScore: 1, awayScore: 1, minute: "FT", live: false, statusText: "Tugadi" },
+        { id: 105, league: "EPL", home: "Liverpool", away: "Chelsea", homeScore: 0, awayScore: 0, minute: "21:00", live: false, statusText: "Bugun" },
+        { id: 106, league: "Superliga", home: "Navbahor", away: "OKMK", homeScore: 2, awayScore: 1, minute: "FT", live: false, statusText: "Tugadi" }
+      ],
+      standings: {
+        EPL: [
+          { pos: 1, team: "Manchester City", p: 27, w: 20, d: 4, l: 3, gd: "+42", pts: 64 },
+          { pos: 2, team: "Arsenal", p: 27, w: 19, d: 5, l: 3, gd: "+38", pts: 62 },
+          { pos: 3, team: "Liverpool", p: 27, w: 17, d: 6, l: 4, gd: "+30", pts: 57 },
+          { pos: 4, team: "Aston Villa", p: 27, w: 15, d: 5, l: 7, gd: "+18", pts: 50 },
+          { pos: 5, team: "Tottenham", p: 27, w: 14, d: 5, l: 8, gd: "+14", pts: 47 }
+        ],
+        LaLiga: [
+          { pos: 1, team: "Real Madrid", p: 27, w: 21, d: 4, l: 2, gd: "+45", pts: 67 },
+          { pos: 2, team: "Barcelona", p: 27, w: 19, d: 4, l: 4, gd: "+39", pts: 61 },
+          { pos: 3, team: "Girona", p: 27, w: 17, d: 5, l: 5, gd: "+24", pts: 56 },
+          { pos: 4, team: "Atletico Madrid", p: 27, w: 16, d: 5, l: 6, gd: "+22", pts: 53 }
+        ],
+        Superliga: [
+          { pos: 1, team: "Nasaf Qarshi", p: 18, w: 12, d: 5, l: 1, gd: "+21", pts: 41 },
+          { pos: 2, team: "Paxtakor Toshkent", p: 18, w: 11, d: 5, l: 2, gd: "+19", pts: 38 },
+          { pos: 3, team: "Navbahor Namangan", p: 18, w: 10, d: 6, l: 2, gd: "+16", pts: 36 },
+          { pos: 4, team: "OKMK Olmaliq", p: 18, w: 9, d: 4, l: 5, gd: "+10", pts: 31 }
+        ],
+        UCL: [
+          { pos: 1, team: "Real Madrid (ESP)", p: 8, w: 7, d: 1, l: 0, gd: "+16", pts: 22 },
+          { pos: 2, team: "Manchester City (ENG)", p: 8, w: 6, d: 2, l: 0, gd: "+14", pts: 20 },
+          { pos: 3, team: "Bayern Munich (GER)", p: 8, w: 6, d: 1, l: 1, gd: "+12", pts: 19 },
+          { pos: 4, team: "PSG (FRA)", p: 8, w: 5, d: 2, l: 1, gd: "+9", pts: 17 }
+        ]
+      },
+      topScorers: [
+        { name: "Erling Haaland", team: "Man City", goals: 22, assists: 6, photo: "https://images.unsplash.com/photo-1522778119026-d647f0596c20?auto=format&fit=crop&w=200&q=80" },
+        { name: "Kylian Mbappé", team: "Real Madrid", goals: 21, assists: 8, photo: "https://images.unsplash.com/photo-1508098682722-e99c43a406b2?auto=format&fit=crop&w=200&q=80" },
+        { name: "Robert Lewandowski", team: "Barcelona", goals: 18, assists: 4, photo: "https://images.unsplash.com/photo-1574629810360-7efbbe195018?auto=format&fit=crop&w=200&q=80" }
+      ],
+      transfers: [
+        {
+          player: "Florian Wirtz",
+          age: 22,
+          fromClub: "Bayer Leverkusen",
+          toClub: "Real Madrid",
+          fee: "€120M",
+          probability: 85,
+          image: "https://images.unsplash.com/photo-1517927033932-b3d18e61fb3a?auto=format&fit=crop&w=500&q=80",
+          status: "Muzokaralar Yakunlanmoqda"
+        },
+        {
+          player: "Abduqodir Xusanov",
+          age: 21,
+          fromClub: "RC Lens",
+          toClub: "Arsenal FC",
+          fee: "€35M",
+          probability: 70,
+          image: "https://images.unsplash.com/photo-1560272564-c83b66b1ad12?auto=format&fit=crop&w=500&q=80",
+          status: "Qiziqish Bildirildi"
+        },
+        {
+          player: "Victor Osimhen",
+          age: 27,
+          fromClub: "Napoli",
+          toClub: "PSG",
+          fee: "€100M",
+          probability: 60,
+          image: "https://images.unsplash.com/photo-1579952363873-27f3bade9f55?auto=format&fit=crop&w=500&q=80",
+          status: "Mish-mishlar"
+        }
+      ],
+      poll: [
+        { id: 1, name: "Kilian Mbappe (Real Madrid)", votes: 6420 },
+        { id: 2, name: "Eldor Shomurodov (O'zbekiston)", votes: 5120 },
+        { id: 3, name: "Jude Bellingham (Real Madrid)", votes: 2100 },
+        { id: 4, name: "Lamine Yamal (Barcelona)", votes: 1250 }
+      ],
+      comments: [
+        { id: 1, author: "Farrux_Real", team: "Real Madrid", text: "Mbappe baribir boshqacha daraja! Bu mavsum Oltin To'p uniki bo'ladi!", time: "5 daqiqa oldin" },
+        { id: 2, author: "Jasur_Uzbek", team: "Uzbekistan", text: "Shomurodovga tasanno! Terma jamoamiz saralashdan albatta o'tadi!", time: "12 daqiqa oldin" },
+        { id: 3, author: "Barca_Fan_88", team: "Barcelona", text: "Yamal va Lewandowski juftligi hali o'z so'zini aytadi!", time: "25 daqiqa oldin" }
+      ]
+    };
+
+    let userVoted = false;
+
+    // INITIALIZATION
+    document.addEventListener('DOMContentLoaded', () => {
+      renderTicker();
+      renderFeaturedHero();
+      renderTrendingNews();
+      renderNewsGrid(MOCK_DATA.news);
+      renderMatchesGrid(MOCK_DATA.matches);
+      renderStandingsTable('EPL');
+      renderTopScorers();
+      renderTransfers();
+      renderPoll();
+      renderComments();
+    });
+
+    // TICKER RENDER
+    function renderTicker() {
+      const container = document.getElementById('ticker-content');
+      // Duplicate for infinite marquee effect
+      const items = [...MOCK_DATA.ticker, ...MOCK_DATA.ticker];
+      container.innerHTML = items.map(item => `
+        <div class="inline-flex items-center gap-2 cursor-pointer hover:text-emerald-400 transition" onclick="switchDashboardTab('matches')">
+          <span class="bg-slate-800 text-slate-300 font-bold px-1.5 py-0.5 rounded text-[10px]">${item.league}</span>
+          <span class="font-semibold text-white">${item.match}</span>
+          <span class="${item.live ? 'text-emerald-400 font-extrabold animate-pulse' : 'text-slate-400'}">${item.status}</span>
+        </div>
+      `).join('<span class="text-slate-700 font-bold">•</span>');
+    }
+
+    // FEATURED HERO RENDER
+    function renderFeaturedHero() {
+      const hero = MOCK_DATA.news.find(n => n.featured) || MOCK_DATA.news[0];
+      const container = document.getElementById('featured-hero');
+      container.onclick = () => openArticle(hero.id);
+      container.innerHTML = `
+        <img src="${hero.image}" class="absolute inset-0 w-full h-full object-cover group-hover:scale-105 transition duration-700 brightness-[0.45]">
+        <div class="absolute inset-0 bg-gradient-to-t from-slate-950 via-slate-950/40 to-transparent"></div>
+        <div class="relative z-10 space-y-3">
+          <div class="flex items-center gap-2">
+            <span class="bg-emerald-500 text-slate-950 font-black text-xs px-3 py-1 rounded-full uppercase tracking-wider">${hero.category}</span>
+            <span class="text-xs text-slate-300 font-medium"><i class="fa-regular fa-clock mr-1"></i> ${hero.date}</span>
+          </div>
+          <h1 class="font-display font-extrabold text-2xl sm:text-4xl text-white leading-tight hover:text-emerald-300 transition">
+            ${hero.title}
+          </h1>
+          <p class="text-slate-300 text-xs sm:text-sm line-clamp-2 max-w-2xl leading-relaxed">
+            ${hero.summary}
+          </p>
+          <div class="flex items-center gap-4 text-xs text-slate-400 pt-2">
+            <span><i class="fa-regular fa-user text-emerald-400 mr-1"></i> ${hero.author}</span>
+            <span><i class="fa-regular fa-eye text-emerald-400 mr-1"></i> ${hero.views}</span>
+            <span><i class="fa-regular fa-bookmark text-emerald-400 mr-1"></i> ${hero.readTime} o'qish</span>
+          </div>
+        </div>
+      `;
+    }
+
+    // TRENDING NEWS LIST
+    function renderTrendingNews() {
+      const container = document.getElementById('trending-news-list');
+      const list = MOCK_DATA.news.filter(n => !n.featured).slice(0, 4);
+      container.innerHTML = list.map((item, idx) => `
+        <div onclick="openArticle(${item.id})" class="flex items-center gap-3 p-2 rounded-xl hover:bg-slate-800/60 transition cursor-pointer group">
+          <span class="font-display font-black text-xl text-slate-600 group-hover:text-emerald-400 w-6 text-center">0${idx+1}</span>
+          <div class="flex-1">
+            <span class="text-[10px] font-bold text-emerald-400 uppercase tracking-wider">${item.category}</span>
+            <h4 class="text-xs font-bold text-slate-200 group-hover:text-white line-clamp-2 leading-snug">${item.title}</h4>
+            <span class="text-[10px] text-slate-400">${item.date}</span>
+          </div>
+        </div>
+      `).join('');
+    }
+
+    // MAIN NEWS GRID
+    function renderNewsGrid(newsList) {
+      const container = document.getElementById('news-grid');
+      if (newsList.length === 0) {
+        container.innerHTML = `<div class="col-span-full py-12 text-center text-slate-400">Ushbu turkumda yangiliklar topilmadi.</div>`;
+        return;
+      }
+      container.innerHTML = newsList.map(item => `
+        <div onclick="openArticle(${item.id})" class="bg-slate-900 border border-slate-800 rounded-2xl overflow-hidden flex flex-col justify-between group hover:border-slate-700 transition cursor-pointer shadow-lg hover:-translate-y-1 duration-300">
+          <div>
+            <div class="relative h-48 overflow-hidden">
+              <img src="${item.image}" class="w-full h-full object-cover group-hover:scale-110 transition duration-500">
+              <span class="absolute top-3 left-3 bg-slate-950/80 backdrop-blur-md text-emerald-400 border border-emerald-500/30 font-bold text-[10px] px-2.5 py-1 rounded-full uppercase">
+                ${item.category}
+              </span>
+            </div>
+            <div class="p-5 space-y-2">
+              <div class="flex items-center justify-between text-[11px] text-slate-400">
+                <span><i class="fa-regular fa-calendar mr-1"></i> ${item.date}</span>
+                <span><i class="fa-regular fa-eye mr-1"></i> ${item.views}</span>
+              </div>
+              <h3 class="font-display font-bold text-base text-white group-hover:text-emerald-400 transition line-clamp-2 leading-snug">
+                ${item.title}
+              </h3>
+              <p class="text-xs text-slate-400 line-clamp-2 leading-relaxed">
+                ${item.summary}
+              </p>
+            </div>
+          </div>
+          <div class="p-5 pt-0 flex items-center justify-between text-xs text-slate-400 border-t border-slate-800/50 mt-4">
+            <span class="text-slate-300 font-medium">${item.author}</span>
+            <span class="text-emerald-400 font-semibold group-hover:translate-x-1 transition flex items-center gap-1">
+              Batafsil <i class="fa-solid fa-chevron-right text-[10px]"></i>
+            </span>
+          </div>
+        </div>
+      `).join('');
+    }
+
+    // MATCHES DASHBOARD RENDER
+    function renderMatchesGrid(matches) {
+      const container = document.getElementById('matches-grid');
+      container.innerHTML = matches.map(m => `
+        <div class="bg-slate-950 border border-slate-800 rounded-xl p-4 flex flex-col justify-between hover:border-slate-700 transition">
+          <div class="flex items-center justify-between text-xs mb-3 pb-2 border-b border-slate-800/60">
+            <span class="font-bold text-slate-400">${m.league}</span>
+            <span class="${m.live ? 'bg-emerald-500/10 text-emerald-400 border border-emerald-500/30' : 'bg-slate-800 text-slate-400'} px-2 py-0.5 rounded text-[10px] font-bold">
+              ${m.live ? '<i class="fa-solid fa-circle text-[6px] mr-1 animate-pulse"></i> ' : ''}${m.statusText}
+            </span>
+          </div>
+          <div class="flex items-center justify-between my-2">
+            <div class="flex items-center gap-3 flex-1">
+              <div class="w-8 h-8 bg-slate-800 rounded-full flex items-center justify-center font-bold text-xs text-white">
+                ${m.home.substring(0, 2).toUpperCase()}
+              </div>
+              <span class="text-sm font-bold text-slate-200">${m.home}</span>
+            </div>
+            <div class="px-3 py-1 bg-slate-900 border border-slate-800 rounded-lg text-lg font-black font-display text-white">
+              ${m.homeScore} : ${m.awayScore}
+            </div>
+            <div class="flex items-center gap-3 flex-1 justify-end">
+              <span class="text-sm font-bold text-slate-200">${m.away}</span>
+              <div class="w-8 h-8 bg-slate-800 rounded-full flex items-center justify-center font-bold text-xs text-white">
+                ${m.away.substring(0, 2).toUpperCase()}
+              </div>
+            </div>
+          </div>
+          <div class="text-center mt-2 pt-2 border-t border-slate-800/40">
+            <span class="text-[11px] text-slate-400 font-medium">Vaqt: ${m.minute}</span>
+          </div>
+        </div>
+      `).join('');
+    }
+
+    function filterMatches(leagueKey) {
+      document.querySelectorAll('.match-filter-chip').forEach(btn => {
+        btn.classList.remove('bg-emerald-500/10', 'text-emerald-400', 'border', 'border-emerald-500/30');
+        btn.classList.add('bg-slate-800', 'text-slate-300');
+      });
+      event.target.classList.remove('bg-slate-800', 'text-slate-300');
+      event.target.classList.add('bg-emerald-500/10', 'text-emerald-400', 'border', 'border-emerald-500/30');
+
+      if (leagueKey === 'all') {
+        renderMatchesGrid(MOCK_DATA.matches);
+      } else {
+        const filtered = MOCK_DATA.matches.filter(m => m.league.toLowerCase().includes(leagueKey.toLowerCase()));
+        renderMatchesGrid(filtered);
+      }
+    }
+
+    // STANDINGS TABLE RENDER
+    function renderStandingsTable(leagueKey) {
+      const tbody = document.getElementById('standings-table-body');
+      const data = MOCK_DATA.standings[leagueKey] || MOCK_DATA.standings['EPL'];
+      
+      tbody.innerHTML = data.map(item => `
+        <tr class="hover:bg-slate-800/40 transition">
+          <td class="py-3 px-3 font-bold ${item.pos <= 4 ? 'text-emerald-400' : 'text-slate-400'}">${item.pos}</td>
+          <td class="py-3 px-4 font-bold text-white flex items-center gap-2">
+            <span class="w-2 h-2 rounded-full ${item.pos <= 4 ? 'bg-emerald-400' : 'bg-slate-600'}"></span>
+            ${item.team}
+          </td>
+          <td class="py-3 px-2 text-center text-slate-300">${item.p}</td>
+          <td class="py-3 px-2 text-center text-slate-300">${item.w}</td>
+          <td class="py-3 px-2 text-center text-slate-300">${item.d}</td>
+          <td class="py-3 px-2 text-center text-slate-300">${item.l}</td>
+          <td class="py-3 px-2 text-center text-slate-400 hidden sm:table-cell">${item.gd}</td>
+          <td class="py-3 px-3 text-center font-black text-emerald-400 font-display">${item.pts}</td>
+        </tr>
+      `).join('');
+    }
+
+    // TOP SCORERS RENDER
+    function renderTopScorers() {
+      const container = document.getElementById('top-scorers-container');
+      container.innerHTML = MOCK_DATA.topScorers.map((s, idx) => `
+        <div class="bg-slate-950 border border-slate-800 rounded-xl p-5 flex items-center gap-4 relative overflow-hidden">
+          <span class="absolute top-2 right-3 font-display font-black text-4xl text-slate-800">#0${idx+1}</span>
+          <img src="${s.photo}" class="w-16 h-16 rounded-full object-cover border-2 border-emerald-500/50 shadow">
+          <div class="relative z-10">
+            <h4 class="font-display font-bold text-white text-base">${s.name}</h4>
+            <p class="text-xs text-slate-400">${s.team}</p>
+            <div class="flex items-center gap-3 mt-2 text-xs">
+              <span class="bg-emerald-500/10 text-emerald-400 font-extrabold px-2 py-0.5 rounded border border-emerald-500/20">${s.goals} ta gol</span>
+              <span class="text-slate-400">${s.assists} assist</span>
+            </div>
+          </div>
+        </div>
+      `).join('');
+    }
+
+    // TRANSFERS RENDER
+    function renderTransfers() {
+      const container = document.getElementById('transfer-cards-grid');
+      container.innerHTML = MOCK_DATA.transfers.map(t => `
+        <div class="bg-slate-950 border border-slate-800 rounded-2xl p-5 flex flex-col justify-between hover:border-amber-500/40 transition shadow-lg">
+          <div>
+            <div class="flex items-center justify-between mb-4">
+              <span class="bg-amber-400/10 text-amber-400 border border-amber-400/20 font-bold text-[10px] px-2.5 py-1 rounded-full uppercase">
+                ${t.status}
+              </span>
+              <span class="font-display font-extrabold text-white text-sm">${t.fee}</span>
+            </div>
+            <div class="flex items-center gap-4 mb-4">
+              <img src="${t.image}" class="w-14 h-14 rounded-full object-cover border-2 border-amber-400/50">
+              <div>
+                <h4 class="font-display font-bold text-white text-lg">${t.player}</h4>
+                <p class="text-xs text-slate-400">Yosh: ${t.age} yoshda</p>
+              </div>
+            </div>
+
+            <!-- Transfer direction -->
+            <div class="bg-slate-900 border border-slate-800/80 rounded-xl p-3 flex items-center justify-between text-xs mb-4">
+              <div class="text-center">
+                <span class="block text-[10px] text-slate-500">Eski klub:</span>
+                <span class="font-bold text-slate-300">${t.fromClub}</span>
+              </div>
+              <i class="fa-solid fa-arrow-right text-amber-400"></i>
+              <div class="text-center">
+                <span class="block text-[10px] text-slate-500">Yangi klub:</span>
+                <span class="font-bold text-white">${t.toClub}</span>
+              </div>
+            </div>
+          </div>
+
+          <!-- Probability bar -->
+          <div class="space-y-1">
+            <div class="flex justify-between text-xs">
+              <span class="text-slate-400">Transfer ehtimoli:</span>
+              <span class="font-bold text-amber-400">${t.probability}%</span>
+            </div>
+            <div class="w-full bg-slate-800 h-2 rounded-full overflow-hidden">
+              <div class="bg-gradient-to-r from-amber-500 to-amber-300 h-full rounded-full" style="width: ${t.probability}%"></div>
+            </div>
+          </div>
+        </div>
+      `).join('');
+    }
+
+    // POLL RENDER & LOGIC
+    function renderPoll() {
+      const container = document.getElementById('poll-options');
+      const totalVotes = MOCK_DATA.poll.reduce((acc, curr) => acc + curr.votes, 0);
+      document.getElementById('total-votes-count').innerHTML = `<i class="fa-solid fa-users mr-1"></i> Jami: ${totalVotes.toLocaleString()} ovoz`;
+
+      container.innerHTML = MOCK_DATA.poll.map(opt => {
+        const percent = Math.round((opt.votes / totalVotes) * 100);
+        return `
+          <div onclick="votePoll(${opt.id})" class="p-3 bg-slate-950 border border-slate-800 rounded-xl cursor-pointer hover:border-emerald-500/50 transition relative overflow-hidden group">
+            <div class="absolute inset-y-0 left-0 bg-emerald-500/10 transition-all duration-500" style="width: ${percent}%"></div>
+            <div class="relative z-10 flex items-center justify-between text-xs font-semibold">
+              <span class="text-white group-hover:text-emerald-300">${opt.name}</span>
+              <span class="text-emerald-400 font-bold">${percent}%</span>
+            </div>
+          </div>
+        `;
+      }).join('');
+    }
+
+    function votePoll(id) {
+      if (userVoted) {
+        alert("Siz allaqachon ovoz bergansiz!");
+        return;
+      }
+      const item = MOCK_DATA.poll.find(p => p.id === id);
+      if (item) {
+        item.votes += 1;
+        userVoted = true;
+        renderPoll();
+      }
+    }
+
+    function resetPoll() {
+      userVoted = false;
+      renderPoll();
+    }
+
+    // COMMENTS RENDER & SUBMISSION
+    function renderComments() {
+      const container = document.getElementById('comments-feed');
+      container.innerHTML = MOCK_DATA.comments.map(c => `
+        <div class="bg-slate-950 border border-slate-800/80 rounded-xl p-3 space-y-1">
+          <div class="flex items-center justify-between">
+            <div class="flex items-center gap-2">
+              <span class="font-bold text-xs text-white">${c.author}</span>
+              <span class="bg-slate-800 text-emerald-400 text-[10px] px-2 py-0.5 rounded font-medium">${c.team}</span>
+            </div>
+            <span class="text-[10px] text-slate-500">${c.time}</span>
+          </div>
+          <p class="text-xs text-slate-300 leading-relaxed">${c.text}</p>
+        </div>
+      `).join('');
+    }
+
+    function submitComment(e) {
+      e.preventDefault();
+      const author = document.getElementById('comment-author').value;
+      const team = document.getElementById('comment-team').value;
+      const text = document.getElementById('comment-text').value;
+
+      if (!author || !text) return;
+
+      MOCK_DATA.comments.unshift({
+        id: Date.now(),
+        author: author,
+        team: team,
+        text: text,
+        time: "Hozirgina"
+      });
+
+      document.getElementById('comment-text').value = '';
+      renderComments();
+    }
+
+    // TAB SWITCHER FOR DASHBOARD
+    function switchDashboardTab(tab) {
+      const matchesTab = document.getElementById('dashboard-matches');
+      const tableTab = document.getElementById('dashboard-table');
+      const scorersTab = document.getElementById('dashboard-scorers');
+
+      const btnMatches = document.getElementById('tab-btn-matches');
+      const btnTable = document.getElementById('tab-btn-table');
+      const btnScorers = document.getElementById('tab-btn-scorers');
+
+      // Reset classes
+      [btnMatches, btnTable, btnScorers].forEach(b => {
+        b.className = "px-4 py-2 text-xs font-bold text-slate-400 hover:text-white rounded-lg transition";
+      });
+
+      [matchesTab, tableTab, scorersTab].forEach(t => t.classList.add('hidden'));
+
+      if (tab === 'matches') {
+        matchesTab.classList.remove('hidden');
+        btnMatches.className = "px-4 py-2 text-xs font-bold rounded-lg transition bg-emerald-500 text-slate-950 shadow";
+      } else if (tab === 'table') {
+        tableTab.classList.remove('hidden');
+        btnTable.className = "px-4 py-2 text-xs font-bold rounded-lg transition bg-emerald-500 text-slate-950 shadow";
+      } else if (tab === 'scorers') {
+        scorersTab.classList.remove('hidden');
+        btnScorers.className = "px-4 py-2 text-xs font-bold rounded-lg transition bg-emerald-500 text-slate-950 shadow";
+      }
+    }
+
+    // CATEGORY FILTERING FOR NEWS
+    function filterCategory(cat) {
+      const badge = document.getElementById('active-category-badge');
+      badge.innerText = `Kategoriya: ${cat === 'all' ? 'Barchasi' : cat}`;
+
+      if (cat === 'all') {
+        renderNewsGrid(MOCK_DATA.news);
+      } else {
+        const filtered = MOCK_DATA.news.filter(n => n.category.toLowerCase() === cat.toLowerCase());
+        renderNewsGrid(filtered);
+      }
+    }
+
+    // SEARCH FUNCTIONALITY
+    function handleSearch() {
+      const query = document.getElementById('search-input').value.toLowerCase();
+      const filtered = MOCK_DATA.news.filter(n => 
+        n.title.toLowerCase().includes(query) || 
+        n.summary.toLowerCase().includes(query) ||
+        n.category.toLowerCase().includes(query)
+      );
+      renderNewsGrid(filtered);
+    }
+
+    function handleSearchMobile() {
+      const query = document.getElementById('search-input-mobile').value.toLowerCase();
+      const filtered = MOCK_DATA.news.filter(n => 
+        n.title.toLowerCase().includes(query) || 
+        n.summary.toLowerCase().includes(query)
+      );
+      renderNewsGrid(filtered);
+    }
+
+    // MOBILE MENU TOGGLE
+    function toggleMobileMenu() {
+      const menu = document.getElementById('mobile-menu');
+      menu.classList.toggle('hidden');
+    }
+
+    // ARTICLE MODAL LOGIC
+    function openArticle(id) {
+      const article = MOCK_DATA.news.find(n => n.id === id);
+      if (!article) return;
+
+      const modalContent = document.getElementById('modal-article-content');
+      modalContent.innerHTML = `
+        <div class="relative h-64 sm:h-80 w-full overflow-hidden">
+          <img src="${article.image}" class="w-full h-full object-cover">
+          <div class="absolute inset-0 bg-gradient-to-t from-slate-900 via-transparent to-transparent"></div>
+        </div>
+        <div class="p-6 sm:p-8 space-y-4">
+          <div class="flex items-center gap-3">
+            <span class="bg-emerald-500 text-slate-950 font-black text-xs px-3 py-1 rounded-full uppercase">${article.category}</span>
+            <span class="text-xs text-slate-400"><i class="fa-regular fa-clock mr-1"></i> ${article.date}</span>
+            <span class="text-xs text-slate-400"><i class="fa-regular fa-eye mr-1"></i> ${article.views}</span>
+          </div>
+          <h2 class="font-display font-extrabold text-2xl sm:text-3xl text-white leading-snug">
+            ${article.title}
+          </h2>
+          <div class="flex items-center gap-3 pb-4 border-b border-slate-800 text-xs text-slate-400">
+            <span>Muallif: <strong class="text-slate-200">${article.author}</strong></span>
+            <span>•</span>
+            <span>O'qish vaqti: <strong class="text-emerald-400">${article.readTime}</strong></span>
+          </div>
+          <div class="text-slate-300 text-sm leading-relaxed space-y-4 pt-2">
+            <p class="font-semibold text-slate-200 text-base leading-relaxed">${article.summary}</p>
+            <p>${article.fullText}</p>
+          </div>
+        </div>
+      `;
+      openModal('article-modal');
+    }
+
+    function openModal(id) {
+      document.getElementById(id).classList.remove('hidden');
+    }
+
+    function closeModal(id) {
+      document.getElementById(id).classList.add('hidden');
+    }
+  </script>
+</body>
+</html>
